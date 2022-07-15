@@ -1,0 +1,4 @@
+Param name,Base value,Lower bound,Upper bound,Unit,Unit type,Const,Base variation estimation,Description,index in vector,,Peeling Step
+gnabar,0.12,0.012,1.2,,Uniform,Open,2,n/a,1,0,None
+gkbar,0.036,0.0036,0.36,,Uniform,Open,3,n/a,2,0,None
+gl,0.0003,0.00003,0.003,,Uniform,Open,2,n/a,3,0,None

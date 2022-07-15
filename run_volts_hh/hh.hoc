@@ -1,0 +1,18 @@
+create soma
+access soma
+insert hh
+
+objref transvec, stim, stimtime
+transvec = new Vector()
+L=15
+print(L)
+print(diam)
+v_init = -65
+proc tfunc(){
+	gnabar_hh = transvec.x(0) //0.12 (S/cm2)	
+	gkbar_hh = transvec.x(1) //.036 (S/cm2)	
+	gl_hh = transvec.x(2) //.0003 (S/cm2)	
+	finitialize(v_init)
+}
+
+
