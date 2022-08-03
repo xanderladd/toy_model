@@ -20,15 +20,16 @@ date=""
 params_opt_ind = [0,1,2]
 run_file = './run_model_cori.hoc'
 run_volts_path = '../../../run_volts/run_volts_' + model + "_" + peeling
-paramsCSV = '/Users/xander/axonstandardized/ToyModel/make_paramset_hdf5/params_reference/params_hh.csv'
-orig_params = h5py.File('/Users/xander/axonstandardized/ToyModel/params/params_hh_full_1000.hdf5', 'r')['orig_full'][0]
+#paramsCSV = '/Users/xander/axonstandardized/ToyModel/make_paramset_hdf5/params_reference/params_hh.csv'
+paramsCSV = '/Users/prarthanghosh/Documents/Model/toy_model/make_paramset_hdf5/params_reference/params_hh.csv'
+orig_params = h5py.File('/Users/prarthanghosh/Documents/Model/toy_model/params/params_hh_full_1000.hdf5', 'r')['orig_full'][0]
 scores_path = './scores_1000/'
 
 # TO DO: set link to correct objectives_file
 # objectives_file = h5py.File('./objectives/multi_stim_without_sensitivity_' + model +  '_' + peeling \
 # + '_1_0_20_stims_no_v_init.hdf5', 'r')
 #objectives_file = h5py.File('./objectives/multi_stim_without_sensitivity_bbp_sodium_1_0_20_stims_no_v_init.hdf5', 'r')
-objectives_file = h5py.File('/Users/xander/axonstandardized/ToyModel/analyze_p/optimization_results_path/multi_stim_hh_full_20_stims_1000.hdf5', 'r')
+objectives_file = h5py.File('/Users/prarthanghosh/Documents/Model/toy_model/analyze_p/optimization_results_path/multi_stim_hh_full_20_stims_1000.hdf5', 'r')
 opt_weight_list = objectives_file['opt_weight_list'][:]
 opt_stim_name_list = objectives_file['opt_stim_name_list'][:]
 score_function_ordered_list = objectives_file['ordered_score_function_list'][:]
@@ -84,11 +85,18 @@ def evaluate_score_function(stim_name_list, target_volts_list, data_volts_list, 
 		return normalized_single_score
 
 	total_score = 0
+	#to_skip = ('AP2_begin_width', 'AP2_peak', 'AP2_begin_voltage', 'AP1_peak', 'AP2_amp', 'AP1_begin_width', 'AP_begin_voltage', 
+	#'AP_begin_time', 'AP2_AP1_peak_diff', 'AP2_AP1_diff', 'AP_begin_indices', 'AP_amplitude_from_voltagebase', 'AP1_width', 'AP_amplitude_diff', 'AP_amplitude_change', 
+	#'AP1_begin_voltage', 'AP1_amp', 'AHP_time_from_peak', 'AP_amplitude', 'AP2_width', 'AHP_slow_time', 'AHP_depth_from_peak')
+	to_skip = ('AP2_begin_width', 'AP2_peak', 'AP2_begin_voltage')
+	print('About to score') # toRemove
 	for i in range(len(stim_name_list)):
 		curr_data_volt = data_volts_list[i]
 		curr_target_volt = target_volts_list[i]
 		for j in range(len(score_function_ordered_list)):
 			curr_sf = score_function_ordered_list[j].decode('ascii')
+			if curr_sf in to_skip:
+				continue
 			curr_weight = weights[len(score_function_ordered_list)*i + j]
 			transformation = h5py.File(scores_path+stim_name_list[i]+'_scores.hdf5', 'r')['transformation_const_'+curr_sf][:]
 			if curr_weight == 0:
@@ -99,6 +107,8 @@ def evaluate_score_function(stim_name_list, target_volts_list, data_volts_list, 
 			if np.isnan(norm_score):
 				norm_score = 1
 			total_score += norm_score * curr_weight
+			print('Finished scoring', curr_sf) # toRemove
+	print('Finished all scoring')
 	return total_score
 
 class hoc_evaluator(bpop.evaluators.Evaluator):
@@ -125,6 +135,7 @@ class hoc_evaluator(bpop.evaluators.Evaluator):
 			curr_opt_ind = self.opt_ind[i]
 			input_values[curr_opt_ind] = param_values[i]
 		sim_start = time.time()
+		#print('About to simulate') # toRemove
 		data_volts_list = run_model(input_values, self.opt_stim_list)
 		sim_end = time.time()
 		score_start = time.time()
